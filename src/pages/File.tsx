@@ -5,6 +5,7 @@ import ListComponent from "../components/List"
 import Container from "../containers/Container"
 import { stateContext } from "../context"
 import { List } from "../interfaces"
+import { ADD_LIST } from "../store/actions"
 
 function File() {
   const { lists, files, listsDispatch } = useContext(stateContext)
@@ -27,7 +28,7 @@ function File() {
     }
 
     listsDispatch({
-      type: "ADD_LIST",
+      type: ADD_LIST,
       payload: newList,
     })
 
@@ -66,18 +67,6 @@ function File() {
           />
         ))}
       </div>
-
-      {/* <div className="hidden md:grid md:grid-cols-3 gap-5">
-        {customSplit<List>(fileLists).map((chunk, index) => (
-          <Fragment key={index}>
-            <div className="space-y-5">
-              {chunk.map((list, index) => (
-                <ListComponent key={index} {...list} />
-              ))}
-            </div>
-          </Fragment>
-        ))}
-      </div> */}
 
       <div className="grid gap-5 md:hidden">
         {fileLists.map((list, index) => (

@@ -1,15 +1,16 @@
 import { FormEvent, useContext, useMemo, useState } from "react"
-import Dropdown from "../containers/Dropdown"
-import { stateContext } from "../context"
-import { List, Todo } from "../interfaces"
-import TodoComponent from "./Todo"
 import {
   HiOutlineChevronDown,
   HiOutlinePencil,
   HiOutlineTrash,
 } from "react-icons/hi"
+import Dropdown from "../containers/Dropdown"
+import { stateContext } from "../context"
+import { List, Todo } from "../interfaces"
+import TodoComponent from "./Todo"
 import RenameModal from "./RenameModal"
 import { getCategories, getCategory } from "../helpers"
+import { ADD_TODO, DELETE_LIST, RENAME_LIST } from '../store/actions'
 
 function Todos({
   id,
@@ -58,7 +59,7 @@ function ListComponent({ id, title, todos, createdAt }: List) {
   // delete the entire list
   function deleteList() {
     listsDispatch({
-      type: "DELETE_LIST",
+      type: DELETE_LIST,
       payload: {
         id,
       },
@@ -67,7 +68,7 @@ function ListComponent({ id, title, todos, createdAt }: List) {
 
   function handleRenameModalSubmit(text: string) {
     listsDispatch({
-      type: "RENAME_LIST",
+      type: RENAME_LIST,
       payload: {
         id,
         title: text,
@@ -88,7 +89,7 @@ function ListComponent({ id, title, todos, createdAt }: List) {
     }
 
     listsDispatch({
-      type: "ADD_TODO",
+      type: ADD_TODO,
       payload: {
         id: id,
         newTodo,

@@ -11,6 +11,7 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi"
 import RenameModal from "./RenameModal"
+import { DELETE_FILE, RENAME_FILE } from "../store/actions"
 
 function Card({ id, title, createdAt }: File) {
   const { lists: allLists, filesDispatch } = useContext(stateContext)
@@ -36,7 +37,7 @@ function Card({ id, title, createdAt }: File) {
 
   function handleRenameModalSubmit(text: string) {
     filesDispatch({
-      type: "RENAME_FILE",
+      type: RENAME_FILE,
       payload: {
         id,
         title: text,
@@ -46,7 +47,7 @@ function Card({ id, title, createdAt }: File) {
 
   function deleteFile() {
     filesDispatch({
-      type: "DELETE_FILE",
+      type: DELETE_FILE,
       payload: {
         id,
       },

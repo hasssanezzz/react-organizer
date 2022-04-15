@@ -9,6 +9,7 @@ import {
 } from "react-icons/hi"
 import Dropdown from "../containers/Dropdown"
 import RenameModal from "./RenameModal"
+import { DELETE_TODO, RENAME_TODO, TOGGLE_TODO } from "../store/actions"
 
 function TodoComponent({
   id,
@@ -33,7 +34,7 @@ function TodoComponent({
 
   function deleteTodo() {
     listsDispatch({
-      type: "DELETE_TODO",
+      type: DELETE_TODO,
       payload: {
         listId,
         todoId: id,
@@ -43,7 +44,7 @@ function TodoComponent({
 
   function renameTodo(text: string) {
     listsDispatch({
-      type: "RENAME_TODO",
+      type: RENAME_TODO,
       payload: {
         listId,
         todoId: id,
@@ -54,7 +55,7 @@ function TodoComponent({
 
   function handleTodoToggle() {
     listsDispatch({
-      type: "TOGGLE_TODO",
+      type: TOGGLE_TODO,
       payload: {
         listId,
         todoId: id,
