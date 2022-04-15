@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  /* @apply bg-gray-100 */
+  @apply bg-gradient-to-tr from-gray-50 to-gray-200
+}
+
+/* input {
+  @apply bg-gray-100 rounded-md px-3 py-1 outline-none focus:ring-1 ring-gray-500 my-1
+} */
