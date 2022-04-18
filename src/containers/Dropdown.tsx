@@ -46,33 +46,3 @@ function Dropdown({
 }
 
 export default Dropdown
-
-/*
-
-<Menu.Item>
-          {({ active }) => (
-            <div className={`px-3 py-2 cursor-pointer text-gray-500 bg-white flex items-center gap-2 rounded-md ${active && "bg-gray-200"}`}>
-              <span><HiOutlineNewspaper size={20} /></span>
-              <span>Papers</span>
-            </div>
-          )}
-        </Menu.Item>
-        <Menu.Item onClick={() => alert('pencil clicked')}>
-          {({ active }) => (
-            <div className={`px-3 py-2 cursor-pointer text-gray-600 bg-white flex items-center gap-2 rounded-md ${active && "bg-gray-200"}`}>
-              <span><HiOutlinePencil size={20} /></span>
-              <span>Pencil</span>
-            </div>
-          )}
-        </Menu.Item>
-        <hr className="block my-2 w-3/4 mx-auto" />
-        <Menu.Item>
-          {({ active }) => (
-            <div className={`px-3 py-2 cursor-pointer text-gray-600 bg-white flex items-center gap-2 rounded-md ${active && "bg-gray-200"}`}>
-              <span><HiOutlineLockOpen size={20} /></span>
-              <span>Lock</span>
-            </div>
-          )}
-        </Menu.Item>
-
-*/

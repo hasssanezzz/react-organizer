@@ -2,6 +2,9 @@ import produce from "immer"
 import { File, List, Todo } from "../interfaces"
 import create, { StateCreator } from "zustand"
 
+!localStorage.files && (localStorage.files = JSON.stringify([]))
+!localStorage.lists && (localStorage.lists = JSON.stringify([]))
+
 const getFileIndex = (id: string, state: File[]) =>
   state.map((file) => file.id).indexOf(id)
 
