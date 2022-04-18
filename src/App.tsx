@@ -5,13 +5,9 @@ import FileComponet from "./pages/File"
 import useStore from "./store"
 import { useEffect } from "react"
 
-!localStorage.files && (localStorage.files = JSON.stringify([]))
-!localStorage.lists && (localStorage.lists = JSON.stringify([]))
-
 function App() {
   const files = useStore(state => state.files)
   const lists = useStore(state => state.lists)
-
 
   useEffect(() => {
     localStorage.files = JSON.stringify(files)
