@@ -1,103 +1,148 @@
 import produce from "immer"
 import { File, List, Todo } from "../interfaces"
+import create, { StateCreator } from "zustand"
 
-interface Action {
-  type: string
-  payload?: any
+const getFileIndex = (id: string, state: File[]) =>
+  state.map((file) => file.id).indexOf(id)
+
+const getListIndex = (id: string, state: List[]) =>
+  state.map((list) => list.id).indexOf(id)
+
+interface State {
+  files: File[]
+  lists: List[]
+
+  // files
+  addFile: (title: string) => void
+  renameFile: (id: string, text: string) => void
+  deleteFile: (id: string) => void
+
+  // lists
+  addList: (fileId: string, title: string) => void
+  addTodo: (listId: string, text: string) => void
+  renameList: (listId: string, title: string) => void
+  deleteList: (listId: string) => void
+
+  // to-do
+  deleteTodo: (listId: string, todoId: string) => void
+  renameTodo: (listId: string, todoId: string, text: string) => void
+  toggleTodo: (listId: string, todoId: string) => void
 }
 
-export function fileReducer(state: File[], action: Action): File[] {
-  const getFileIndex = (id: string) => state.map((file) => file.id).indexOf(id)
+const store: StateCreator<State> = (set) => ({
+  files: JSON.parse(localStorage.files),
+  lists: JSON.parse(localStorage.lists),
 
-  switch (action.type) {
-    case "ADD_FILE":
-      return [...state, action.payload]
+  // ================ files ========================
 
-    case "RENAME_FILE":
-      return produce(state, (draftState) => {
-        const { id, title }: { id: string; title: string } = action.payload
-        const index = getFileIndex(id)
+  addFile: (title: string) =>
+    set((state) => ({
+      files: [
+        ...state.files,
+        {
+          id: Date.now().toString(),
+          title,
+          createdAt: new Date().toLocaleDateString(),
+        },
+      ],
+    })),
+
+  renameFile: (id: string, title: string) =>
+    set((state) => ({
+      files: produce(state.files, (draftState) => {
+        const index = getFileIndex(id, state.files)
         draftState[index].title = title
-      })
+      }),
+    })),
 
-    case "DELETE_FILE":
-      return produce(state, (draftState) => {
-        const { id }: { id: string } = action.payload
-        const fileIndex = getFileIndex(id)
+  deleteFile: (id: string) =>
+    set((state) => ({
+      files: produce(state.files, (draftState) => {
+        const fileIndex = getFileIndex(id, state.files)
         draftState.splice(fileIndex, 1)
-      })
+      }),
+    })),
 
-    default:
-      return state
-  }
-}
+  // ================ lists ========================
 
-export function listReducer(state: List[], action: Action): List[] {
-  const getListIndex = (id: string) => state.map((list) => list.id).indexOf(id)
+  addList: (fileId: string, title: string) =>
+    set((state) => ({
+      lists: [
+        ...state.lists,
+        {
+          id: Date.now().toString(),
+          fileId,
+          title,
+          todos: [],
+          createdAt: new Date().toLocaleDateString(),
+        },
+      ],
+    })),
 
-  switch (action.type) {
-    case "ADD_LIST":
-      return [...state, action.payload]
-
-    case "ADD_TODO":
-      return produce(state, (draftState) => {
-        const { id, newTodo }: { id: string; newTodo: Todo } = action.payload
-        const listIndex = getListIndex(id)
+  addTodo: (listId: string, text: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const newTodo: Todo = {
+          id: Date.now().toString(),
+          text,
+          done: false,
+        }
+        const listIndex = getListIndex(listId, state.lists)
         draftState[listIndex].todos.push(newTodo)
-      })
+      }),
+    })),
 
-    case "DELETE_LIST":
-      return produce(state, (draftState) => {
-        const { id }: { id: string } = action.payload
-        const listIndex = getListIndex(id)
+  renameList: (listId: string, title: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const index = getListIndex(listId, state.lists)
+        draftState[index].title = title
+      }),
+    })),
+
+  deleteList: (listId: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const listIndex = getListIndex(listId, state.lists)
         draftState.splice(listIndex, 1)
-      })
+      }),
+    })),
 
-    case "TOGGLE_TODO":
-      return produce(state, (draftState) => {
-        const { listId, todoId }: { listId: string; todoId: string } =
-          action.payload
-        const listIndex = getListIndex(listId)
+  renameTodo: (listId: string, todoId: string, text: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const listIndex = getListIndex(listId, state.lists)
+        const todoIndex = draftState[listIndex].todos
+          .map((todo) => todo.id)
+          .indexOf(todoId)
+        draftState[listIndex].todos[todoIndex].text = text
+      }),
+    })),
+
+  deleteTodo: (listId: string, todoId: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const listIndex = getListIndex(listId, state.lists)
+        const todoIndex = draftState[listIndex].todos
+          .map((todo) => todo.id)
+          .indexOf(todoId)
+        draftState[listIndex].todos.splice(todoIndex, 1)
+      }),
+    })),
+
+  toggleTodo: (listId: string, todoId: string) =>
+    set((state) => ({
+      lists: produce(state.lists, (draftState) => {
+        const listIndex = getListIndex(listId, state.lists)
         const todoIndex = draftState[listIndex].todos
           .map((todo) => todo.id)
           .indexOf(todoId)
         draftState[listIndex].todos[todoIndex].done =
           !draftState[listIndex].todos[todoIndex].done
-      })
+      }),
+    })),
+})
 
-    case "DELETE_TODO":
-      return produce(state, (draftState) => {
-        const { listId, todoId }: { listId: string; todoId: string } =
-          action.payload
-        const listIndex = getListIndex(listId)
-        const todoIndex = draftState[listIndex].todos
-          .map((todo) => todo.id)
-          .indexOf(todoId)
-        draftState[listIndex].todos.splice(todoIndex, 1)
-      })
+const useStore = create(store)
 
-    case "RENAME_LIST":
-      return produce(state, (draftState) => {
-        const { id, title }: { id: string; title: string } = action.payload
-        const index = getListIndex(id)
-        draftState[index].title = title
-      })
-
-    case "RENAME_TODO":
-      return produce(state, (draftState) => {
-        const {
-          listId,
-          todoId,
-          text,
-        }: { listId: string; todoId: string; text: string } = action.payload
-        const listIndex = getListIndex(listId)
-        const todoIndex = draftState[listIndex].todos
-          .map((todo) => todo.id)
-          .indexOf(todoId)
-        draftState[listIndex].todos[todoIndex].text = text
-      })
-
-    default:
-      return state
-  }
-}
+export default useStore

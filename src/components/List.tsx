@@ -1,16 +1,15 @@
-import { FormEvent, useContext, useMemo, useState } from "react"
+import { FormEvent, useMemo, useState } from "react"
 import {
   HiOutlineChevronDown,
   HiOutlinePencil,
   HiOutlineTrash,
 } from "react-icons/hi"
 import Dropdown from "../containers/Dropdown"
-import { stateContext } from "../context"
 import { List, Todo } from "../interfaces"
 import TodoComponent from "./Todo"
 import RenameModal from "./RenameModal"
 import { getCategories, getCategory } from "../helpers"
-import { ADD_TODO, DELETE_LIST, RENAME_LIST } from '../store/actions'
+import useStore from "../store"
 
 function Todos({
   id,
@@ -23,7 +22,10 @@ function Todos({
 }) {
   return (
     <main className="flex flex-col gap-3 bg-gray-50 py-2 px-3 rounded-md shadow border transition-all duration-150">
-      <h3 className="font-bold">{category !== "General" && "#"}{category} ({todos.length})</h3>
+      <h3 className="font-bold">
+        {category !== "General" && "#"}
+        {category} ({todos.length})
+      </h3>
 
       {todos
         .filter((todo) => !todo.done)
@@ -48,54 +50,30 @@ function Todos({
 }
 
 function ListComponent({ id, title, todos, createdAt }: List) {
-  const { listsDispatch } = useContext(stateContext)
   const [text, setText] = useState<string>("")
   const [active, setActive] = useState<boolean>(false)
+
+  const addTodo = useStore(state => state.addTodo)
+  const renameList = useStore(state => state.renameList)
+  const deleteList = useStore(state => state.deleteList)
 
   const [modalTitle, setModalTitle] = useState(title)
 
   const categories = useMemo(() => getCategories(todos), [todos])
 
-  // delete the entire list
-  function deleteList() {
-    listsDispatch({
-      type: DELETE_LIST,
-      payload: {
-        id,
-      },
-    })
+  function handleDeleteList() {
+    deleteList(id)
   }
 
   function handleRenameModalSubmit(text: string) {
-    listsDispatch({
-      type: RENAME_LIST,
-      payload: {
-        id,
-        title: text,
-      },
-    })
-
+    renameList(id, text)
     setModalTitle(text)
   }
 
   // add a new todo
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-
-    const newTodo: Todo = {
-      id: Date.now().toString(),
-      text,
-      done: false,
-    }
-
-    listsDispatch({
-      type: ADD_TODO,
-      payload: {
-        id: id,
-        newTodo,
-      },
-    })
-
+    addTodo(id, text)
     setText("")
   }
 
@@ -103,7 +81,9 @@ function ListComponent({ id, title, todos, createdAt }: List) {
     <div className="bg-white shadow px-5 pt-5 pb-3 rounded-xl space-y-5 min-w-[300px]">
       <header className="flex justify-between items-center">
         <div className="flex flex-col">
-          <h2 className="font-bold text-xl">{title} ({todos.length})</h2>
+          <h2 className="font-bold text-xl">
+            {title} ({todos.length})
+          </h2>
           <p className="text-sm text-gray-400">{createdAt}</p>
         </div>
         <div>
@@ -119,7 +99,7 @@ function ListComponent({ id, title, todos, createdAt }: List) {
                 text: "Delete",
                 icon: <HiOutlineTrash size={20} />,
                 danger: true,
-                onClick: deleteList,
+                onClick: handleDeleteList,
               },
             ]}
           >

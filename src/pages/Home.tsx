@@ -1,26 +1,19 @@
-import { useContext } from "react"
 import { FormEvent, useState } from "react"
 import Card from "../components/Card"
 import Container from "../containers/Container"
-import { stateContext } from "../context"
 import { File } from "../interfaces"
+import useStore from '../store'
 
 function Home() {
-  const { files, filesDispatch } = useContext(stateContext)
+  const files = useStore(state => state.files)
+  const addFile = useStore(state => state.addFile)
 
   const [title, setTitle] = useState<string>("")
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
 
-    filesDispatch({
-      type: "ADD_FILE",
-      payload: {
-        id: Date.now().toString(),
-        title,
-        createdAt: new Date().toLocaleDateString(),
-      },
-    })
+    addFile(title)
 
     setTitle("")
   }

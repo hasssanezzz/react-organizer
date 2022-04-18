@@ -1,9 +1,7 @@
-import { Fragment, useCallback, useContext, useMemo, useState } from "react"
+import { Fragment, useCallback, useMemo, useState } from "react"
 import { Link } from "react-router-dom"
 import Dropdown from "../containers/Dropdown"
-import { stateContext } from "../context"
 import { File, Todo } from "../interfaces"
-
 import {
   HiOutlineArchive,
   HiOutlineChevronDown,
@@ -11,10 +9,13 @@ import {
   HiOutlineTrash,
 } from "react-icons/hi"
 import RenameModal from "./RenameModal"
-import { DELETE_FILE, RENAME_FILE } from "../store/actions"
+import useStore from "../store"
 
 function Card({ id, title, createdAt }: File) {
-  const { lists: allLists, filesDispatch } = useContext(stateContext)
+  const allLists = useStore((state) => state.lists)
+  const renameFile = useStore((state) => state.renameFile)
+  const deleteFile = useStore((state) => state.deleteFile)
+
   const lists = allLists.filter((list) => list.fileId === id)
   const [active, setActive] = useState<boolean>(false)
 
@@ -36,22 +37,11 @@ function Card({ id, title, createdAt }: File) {
   }, [allLists])
 
   function handleRenameModalSubmit(text: string) {
-    filesDispatch({
-      type: RENAME_FILE,
-      payload: {
-        id,
-        title: text,
-      },
-    })
+    renameFile(id, text)
   }
 
-  function deleteFile() {
-    filesDispatch({
-      type: DELETE_FILE,
-      payload: {
-        id,
-      },
-    })
+  function handleDeleteFile() {
+    deleteFile(id)
   }
 
   return (
@@ -78,7 +68,7 @@ function Card({ id, title, createdAt }: File) {
                 text: "Delete",
                 icon: <HiOutlineTrash size={20} />,
                 danger: true,
-                onClick: deleteFile
+                onClick: handleDeleteFile,
               },
             ]}
           >

@@ -1,14 +1,15 @@
-import { FormEvent, useContext } from "react"
+import { FormEvent } from "react"
 import { useState } from "react"
 import { Link, useParams } from "react-router-dom"
 import ListComponent from "../components/List"
 import Container from "../containers/Container"
-import { stateContext } from "../context"
-import { List } from "../interfaces"
-import { ADD_LIST } from "../store/actions"
+import useStore from "../store"
 
 function File() {
-  const { lists, files, listsDispatch } = useContext(stateContext)
+  const files = useStore(state => state.files)
+  const lists = useStore(state => state.lists)
+  const addList = useStore(state => state.addList)
+
   const { id: fileId } = useParams()
 
   const file = files.filter((file) => file.id === fileId)[0]
@@ -18,20 +19,7 @@ function File() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
-
-    const newList: List = {
-      id: Date.now().toString(),
-      fileId: typeof fileId === "string" ? fileId : "",
-      title,
-      todos: [],
-      createdAt: new Date().toLocaleDateString(),
-    }
-
-    listsDispatch({
-      type: ADD_LIST,
-      payload: newList,
-    })
-
+    addList(typeof fileId === "string" ? fileId : "", title)
     setTitle("")
   }
 

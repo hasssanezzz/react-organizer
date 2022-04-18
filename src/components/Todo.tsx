@@ -1,6 +1,5 @@
-import { useContext, useState } from "react"
+import { useState } from "react"
 import { useSpring, animated } from "@react-spring/web"
-import { stateContext } from "../context"
 import CheckBox from "./Checkbox"
 import {
   HiOutlineDotsVertical,
@@ -9,7 +8,7 @@ import {
 } from "react-icons/hi"
 import Dropdown from "../containers/Dropdown"
 import RenameModal from "./RenameModal"
-import { DELETE_TODO, RENAME_TODO, TOGGLE_TODO } from "../store/actions"
+import useStore from "../store"
 
 function TodoComponent({
   id,
@@ -24,43 +23,25 @@ function TodoComponent({
   text: string
   done: boolean
 }) {
-  const { listsDispatch } = useContext(stateContext)
-
   const [renameModalActive, setRenameModalActive] = useState<boolean>(false)
-
   const valuedIndex = typeof index === "number" ? index : 0
-
   const props = useSpring({ to: { opacity: 1, rotate: 0, scale: 1 }, from: { opacity: 0, rotate: 0, scale: 0.9 } })
 
-  function deleteTodo() {
-    listsDispatch({
-      type: DELETE_TODO,
-      payload: {
-        listId,
-        todoId: id,
-      },
-    })
+  const deleteTodo = useStore(state => state.deleteTodo)
+  const renameTodo = useStore(state => state.renameTodo)
+  const toggleTodo = useStore(state => state.toggleTodo)
+
+  function handleDeleteTodo() {
+    deleteTodo(listId, id)
   }
 
-  function renameTodo(text: string) {
-    listsDispatch({
-      type: RENAME_TODO,
-      payload: {
-        listId,
-        todoId: id,
-        text,
-      },
-    })
+
+  function handleRenameTodo(text: string) {
+    renameTodo(listId, id, text)
   }
 
   function handleTodoToggle() {
-    listsDispatch({
-      type: TOGGLE_TODO,
-      payload: {
-        listId,
-        todoId: id,
-      },
-    })
+    toggleTodo(listId, id)
   }
 
   return (
@@ -92,7 +73,7 @@ function TodoComponent({
               text: "Delete",
               icon: <HiOutlineTrash size={20} />,
               danger: true,
-              onClick: deleteTodo,
+              onClick: handleDeleteTodo,
             },
           ]}
         >
@@ -103,7 +84,7 @@ function TodoComponent({
           active={renameModalActive}
           setActive={setRenameModalActive}
           defaultValue={text}
-          onSubmit={renameTodo}
+          onSubmit={handleRenameTodo}
         />
       </div>
     </animated.div>
