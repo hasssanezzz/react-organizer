@@ -55,12 +55,6 @@ function File() {
           />
         ))}
       </div>
-
-      <div className="grid gap-5 md:hidden">
-        {fileLists.map((list, index) => (
-          <ListComponent key={index} {...list} />
-        ))}
-      </div>
     </Container>
   )
 }

@@ -1,8 +1,12 @@
 import { FormEvent, useMemo, useState } from "react"
 import {
+  HiDotsVertical,
+  HiOutlineCheckCircle,
   HiOutlineChevronDown,
+  HiOutlineEye,
   HiOutlinePencil,
   HiOutlineTrash,
+  HiOutlineXCircle,
 } from "react-icons/hi"
 import Dropdown from "../containers/Dropdown"
 import { List, Todo } from "../interfaces"
@@ -50,16 +54,24 @@ function Todos({
 }
 
 function ListComponent({ id, title, todos, createdAt }: List) {
+  const addTodo = useStore((state) => state.addTodo)
+  const renameList = useStore((state) => state.renameList)
+  const deleteList = useStore((state) => state.deleteList)
+
   const [text, setText] = useState<string>("")
   const [active, setActive] = useState<boolean>(false)
-
-  const addTodo = useStore(state => state.addTodo)
-  const renameList = useStore(state => state.renameList)
-  const deleteList = useStore(state => state.deleteList)
-
+  const [view, setView] = useState<number>(0)
   const [modalTitle, setModalTitle] = useState(title)
 
-  const categories = useMemo(() => getCategories(todos), [todos])
+  const getTodoByView = useMemo(() => {
+    if (view === 0) return todos
+    else if (view === 1) return todos.filter((todo) => todo.done)
+    else return todos.filter((todo) => !todo.done)
+  }, [todos, view])
+
+  const categories = useMemo(() => {
+    return getCategories(getTodoByView)
+  }, [getTodoByView])
 
   function handleDeleteList() {
     deleteList(id)
@@ -74,21 +86,49 @@ function ListComponent({ id, title, todos, createdAt }: List) {
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     addTodo(id, text)
+    setView(0)
     setText("")
   }
 
   return (
     <div className="bg-white shadow px-5 pt-5 pb-3 rounded-xl space-y-5 min-w-[300px]">
-      <header className="flex justify-between items-center">
+      <header className="flex justify-between items-center gap-3">
         <div className="flex flex-col">
           <h2 className="font-bold text-xl">
             {title} ({todos.length})
           </h2>
           <p className="text-sm text-gray-400">{createdAt}</p>
         </div>
-        <div>
+        <div className="flex gap-2 items-center">
           <Dropdown
-            className="p-1 rounded-md hover:bg-gray-200"
+            className={`px-3 py-1 rounded-md hover:bg-gray-50 text-gray-500 flex items-center gap-1 border`}
+            data={[
+              {
+                text: "All",
+                icon: <HiOutlineEye size={20} />,
+                onClick: () => setView(0),
+              },
+              {
+                text: "Compeleted only",
+                icon: <HiOutlineCheckCircle size={20} />,
+                onClick: () => setView(1),
+              },
+              {
+                text: "Uncompleted only",
+                icon: <HiOutlineXCircle size={20} />,
+                onClick: () => setView(2),
+              },
+            ]}
+          >
+            <span>
+              {view === 0 && "All"}
+              {view === 1 && "Compeleted"}
+              {view === 2 && "Uncompleted"}
+            </span>
+            <HiOutlineChevronDown size={15} />
+          </Dropdown>
+          <Dropdown
+            className={`p-2 rounded-md hover:bg-gray-50 text-gray-500 flex items-center gap-1 border`}
             data={[
               {
                 text: "Rename",
@@ -103,14 +143,14 @@ function ListComponent({ id, title, todos, createdAt }: List) {
               },
             ]}
           >
-            <HiOutlineChevronDown size={20} className="text-gray-500" />
+            <HiDotsVertical size={15} className="text-gray-500" />
           </Dropdown>
         </div>
       </header>
 
-      {todos.filter((todo) => getCategory(todo.text) === "").length ? (
+      {getTodoByView.filter((todo) => getCategory(todo.text) === "").length ? (
         <Todos
-          todos={todos.filter((todo) => getCategory(todo.text) === "")}
+          todos={getTodoByView.filter((todo) => getCategory(todo.text) === "")}
           id={id}
           category="General"
         />
@@ -122,7 +162,9 @@ function ListComponent({ id, title, todos, createdAt }: List) {
         <Todos
           key={index}
           id={id}
-          todos={todos.filter((todo) => getCategory(todo.text) === category)}
+          todos={getTodoByView.filter(
+            (todo) => getCategory(todo.text) === category
+          )}
           category={category}
         />
       ))}

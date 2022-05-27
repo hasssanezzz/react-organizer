@@ -5,6 +5,7 @@ interface Element {
   icon?: any
   danger?: boolean
   hr?: boolean
+  selected?: boolean
   onClick?: () => void
 }
 
@@ -27,7 +28,7 @@ function Dropdown({
             <Menu.Item key={index} onClick={() => ele.onClick && ele.onClick()}>
               {({ active }) => (
                 <div
-                  className={`px-3 py-2 cursor-pointer ${ele.danger ? "text-red-500" : "text-gray-500"} bg-white flex items-center gap-2 rounded-md ${
+                  className={`px-3 py-2 cursor-pointer ${ele.danger ? "text-red-500" : ("text-gray-500")} bg-white flex items-center gap-2 rounded-md ${
                     active && (ele.danger ? "bg-red-200" : "bg-gray-200")
                   }`}
                 >
