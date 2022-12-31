@@ -25,13 +25,13 @@ $ npm run build
 
 ## Breakdown
 
-You have file, every file contain lists, every list contain labeled todos, to a todo a `#<your_label>` seprated by spaces in the todo text.
+You have files, every file contains lists, every list contains labeled todos, to label a todo insert `#<your_label>` seprated by spaces in the todo text.
 
 Examples: `unit 4 #homework`, `unit 3 #exersice`
 
 ## Preview
 
-#### Files:
+#### Files view:
 ![Screenshot](./screenshots/1.png)
 
 #### File containing some lists:
